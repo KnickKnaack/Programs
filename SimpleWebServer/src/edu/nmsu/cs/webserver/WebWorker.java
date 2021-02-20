@@ -30,10 +30,25 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import java.io.File;
+import java.io.FileReader;
+
 public class WebWorker implements Runnable
 {
 
 	private Socket socket;
+	private File fileToGet;
+	private String contentType = "text/html";
+	private String statusCode = "";
+	private BufferedReader r = null;
+	private FileReader fr= null;
+
+	//for date formatting later
+	Date d;
+	DateFormat df;
+
+
+
 
 	/**
 	 * Constructor: must have a valid open socket
@@ -50,13 +65,19 @@ public class WebWorker implements Runnable
 	 **/
 	public void run()
 	{
+		
+		d = new Date();
+		df = DateFormat.getDateTimeInstance();
+		df.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+
 		System.err.println("Handling connection...");
 		try
 		{
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
 			readHTTPRequest(is);
-			writeHTTPHeader(os, "text/html");
+			writeHTTPHeader(os);
 			writeContent(os);
 			os.flush();
 			socket.close();
@@ -75,7 +96,7 @@ public class WebWorker implements Runnable
 	private void readHTTPRequest(InputStream is)
 	{
 		String line;
-		BufferedReader r = new BufferedReader(new InputStreamReader(is));
+		r = new BufferedReader(new InputStreamReader(is));
 		while (true)
 		{
 			try
@@ -83,9 +104,26 @@ public class WebWorker implements Runnable
 				while (!r.ready())
 					Thread.sleep(1);
 				line = r.readLine();
-				System.err.println("Request line: (" + line + ")");
 				if (line.length() == 0)
 					break;
+
+				System.err.println("Request line: (" + line + ")");
+				
+				if (line.indexOf("GET") != -1) {
+
+
+					try {
+						fileToGet = new File(System.getProperty("user.dir") + 
+							line.substring(line.indexOf(" ") + 1, line.lastIndexOf(" ")));
+						fr = new FileReader(fileToGet);
+						statusCode = "HTTP/1.1 200 OK\n";
+					}
+
+					catch (Exception e) {
+						statusCode = "HTTP/1.1 404 Not Found\n";
+					}
+				}
+
 			}
 			catch (Exception e)
 			{
@@ -104,12 +142,10 @@ public class WebWorker implements Runnable
 	 * @param contentType
 	 *          is the string MIME content type (e.g. "text/html")
 	 **/
-	private void writeHTTPHeader(OutputStream os, String contentType) throws Exception
+	private void writeHTTPHeader(OutputStream os) throws Exception
 	{
-		Date d = new Date();
-		DateFormat df = DateFormat.getDateTimeInstance();
-		df.setTimeZone(TimeZone.getTimeZone("GMT"));
-		os.write("HTTP/1.1 200 OK\n".getBytes());
+
+		os.write(statusCode.getBytes());
 		os.write("Date: ".getBytes());
 		os.write((df.format(d)).getBytes());
 		os.write("\n".getBytes());
@@ -132,9 +168,40 @@ public class WebWorker implements Runnable
 	 **/
 	private void writeContent(OutputStream os) throws Exception
 	{
-		os.write("<html><head></head><body>\n".getBytes());
-		os.write("<h3>My web server works!</h3>\n".getBytes());
-		os.write("</body></html>\n".getBytes());
+		
+		System.out.print(statusCode);
+		System.out.println(fileToGet.toString());
+
+
+		//make sure there is no 404 error
+		if (statusCode != "HTTP/1.1 404 Not Found\n")  {
+			r = new BufferedReader(fr);
+			String ln = r.readLine();
+			int index;
+			while (ln != null) {
+
+				
+				index = ln.indexOf("<cs371date>");
+			    if (index != -1) {
+					ln = ln.substring(0, index) + df.format(d) + ln.substring(index + 11);
+				}
+				
+				index = ln.indexOf("<cs371server>");
+				if (index != -1) {
+					ln = ln.substring(0, index) + "xXGamerBoiXx's Server" + ln.substring(index + 13);
+				}
+				
+				os.write(ln.getBytes());
+				ln = r.readLine(); 
+			}
+		}
+
+		//else print 404 not found
+		else {
+			os.write("<html><head></head><body>\n".getBytes());
+			os.write("<h3>404 File Not Found!</h3>\n".getBytes());
+			os.write("</body></html>\n".getBytes());
+		}
 	}
 
 } // end class
