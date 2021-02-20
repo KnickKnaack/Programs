@@ -38,8 +38,13 @@ public class WebWorker implements Runnable
 
 	private Socket socket;
 	private File fileToGet;
+
+	//data used for header information
+	//dontent type currently constant
 	private String contentType = "text/html";
 	private String statusCode = "";
+
+	// used later for reading file and instream
 	private BufferedReader r = null;
 	private FileReader fr= null;
 
@@ -109,16 +114,19 @@ public class WebWorker implements Runnable
 
 				System.err.println("Request line: (" + line + ")");
 				
+				//if the request is a get request
 				if (line.indexOf("GET") != -1) {
 
-
+					// attempt to make a file reader of the file at that location
 					try {
 						fileToGet = new File(System.getProperty("user.dir") + 
 							line.substring(line.indexOf(" ") + 1, line.lastIndexOf(" ")));
 						fr = new FileReader(fileToGet);
+						//if successful, change status to 200 OK because the file exists
 						statusCode = "HTTP/1.1 200 OK\n";
 					}
 
+					//if not successful, then change status to 404 Not Found
 					catch (Exception e) {
 						statusCode = "HTTP/1.1 404 Not Found\n";
 					}
@@ -149,7 +157,7 @@ public class WebWorker implements Runnable
 		os.write("Date: ".getBytes());
 		os.write((df.format(d)).getBytes());
 		os.write("\n".getBytes());
-		os.write("Server: Jon's very own server\n".getBytes());
+		os.write("Server: Nick's very own server\n".getBytes());
 		// os.write("Last-Modified: Wed, 08 Jan 2003 23:11:55 GMT\n".getBytes());
 		// os.write("Content-Length: 438\n".getBytes());
 		os.write("Connection: close\n".getBytes());
@@ -175,17 +183,21 @@ public class WebWorker implements Runnable
 
 		//make sure there is no 404 error
 		if (statusCode != "HTTP/1.1 404 Not Found\n")  {
+			//reassign r to a reader for the file
 			r = new BufferedReader(fr);
 			String ln = r.readLine();
 			int index;
+
+			//while there is something to print from the file
 			while (ln != null) {
 
-				
+				//if there is "<cs371date>" then replace it with the date format
 				index = ln.indexOf("<cs371date>");
 			    if (index != -1) {
 					ln = ln.substring(0, index) + df.format(d) + ln.substring(index + 11);
 				}
 				
+				//if there is "<cs371server>" then replace it with "xXGamerBoiXx's Server" cuz why not
 				index = ln.indexOf("<cs371server>");
 				if (index != -1) {
 					ln = ln.substring(0, index) + "xXGamerBoiXx's Server" + ln.substring(index + 13);
@@ -196,7 +208,7 @@ public class WebWorker implements Runnable
 			}
 		}
 
-		//else print 404 not found
+		//else print 404 not found for user
 		else {
 			os.write("<html><head></head><body>\n".getBytes());
 			os.write("<h3>404 File Not Found!</h3>\n".getBytes());
