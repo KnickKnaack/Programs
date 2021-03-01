@@ -20,7 +20,7 @@
 
     <target name = "run" depends= "compile" description = "run program 1">
 	    <!-- Run SimpleWebServer-->
-	    <java className="edu.nmsu.cs.webserver.WebServer"  classpath="src"
+	    <java className="edu.nmsu.cs.webserver.WebServer"  classpath="bin"
             fork = "true"
             dir = "www"
         />

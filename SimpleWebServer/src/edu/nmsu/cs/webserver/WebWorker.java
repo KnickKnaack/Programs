@@ -30,8 +30,11 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Files;
+
 
 public class WebWorker implements Runnable
 {
@@ -41,8 +44,8 @@ public class WebWorker implements Runnable
 
 	//data used for header information
 	//dontent type currently constant
-	private String contentType = "text/html";
-	private String statusCode = "";
+	private String contentType;
+	private String statusCode;
 
 	// used later for reading file and instream
 	private BufferedReader r = null;
@@ -119,15 +122,20 @@ public class WebWorker implements Runnable
 
 					// attempt to make a file reader of the file at that location
 					try {
-						fileToGet = new File(System.getProperty("user.dir") + 
-							line.substring(line.indexOf(" ") + 1, line.lastIndexOf(" ")));
+						String fileName = line.substring(line.indexOf(" ") + 1, line.lastIndexOf(" "));
+
+						fileToGet = new File(System.getProperty("user.dir") + fileName);
 						fr = new FileReader(fileToGet);
 						//if successful, change status to 200 OK because the file exists
 						statusCode = "HTTP/1.1 200 OK\n";
+
+						//change the content type for the header by giving the file content type
+						changeContentType(fileName.substring(fileName.indexOf(".") + 1));
 					}
 
-					//if not successful, then change status to 404 Not Found
+					//if not successful, then change status to 404 Not Found and header to html for printing
 					catch (Exception e) {
+						contentType = "text/html";
 						statusCode = "HTTP/1.1 404 Not Found\n";
 					}
 				}
@@ -178,34 +186,51 @@ public class WebWorker implements Runnable
 	{
 		
 		System.out.print(statusCode);
-		System.out.println(fileToGet.toString());
+		//System.out.println(fileToGet.toString());
 
 
 		//make sure there is no 404 error
 		if (statusCode != "HTTP/1.1 404 Not Found\n")  {
-			//reassign r to a reader for the file
-			r = new BufferedReader(fr);
-			String ln = r.readLine();
-			int index;
 
-			//while there is something to print from the file
-			while (ln != null) {
+			System.out.println(contentType + "-" + contentType.substring(0, contentType.indexOf("/")) + "-");
 
-				//if there is "<cs371date>" then replace it with the date format
-				index = ln.indexOf("<cs371date>");
-			    if (index != -1) {
-					ln = ln.substring(0, index) + df.format(d) + ln.substring(index + 11);
+			//if this is a text file then read line by line
+			if (contentType.substring(0, contentType.indexOf("/")).compareTo("text") == 0) {
+				System.out.println("TEST");
+
+				//reassign r to a reader for the file
+				r = new BufferedReader(fr);
+
+				String ln = r.readLine();
+				int index;
+
+				//while there is something to print from the file
+				while (ln != null) {
+
+
+
+					//if there is "<cs371date>" then replace it with the date format
+					index = ln.indexOf("<cs371date>");
+					if (index != -1) {
+						ln = ln.substring(0, index) + df.format(d) + ln.substring(index + 11);
+					}
+					
+					//if there is "<cs371server>" then replace it with "xXGamerBoiXx's Server" cuz why not
+					index = ln.indexOf("<cs371server>");
+					if (index != -1) {
+						ln = ln.substring(0, index) + "xXGamerBoiXx's Server" + ln.substring(index + 13);
+					}
+					
+					os.write(ln.getBytes());
+					ln = r.readLine(); 
 				}
-				
-				//if there is "<cs371server>" then replace it with "xXGamerBoiXx's Server" cuz why not
-				index = ln.indexOf("<cs371server>");
-				if (index != -1) {
-					ln = ln.substring(0, index) + "xXGamerBoiXx's Server" + ln.substring(index + 13);
-				}
-				
-				os.write(ln.getBytes());
-				ln = r.readLine(); 
 			}
+
+			// else if its an image file read all bytes at once
+			else if (contentType.substring(0, contentType.indexOf("/")).compareTo("image") == 0) {
+				os.write(Files.readAllBytes(fileToGet.toPath()));
+			}
+
 		}
 
 		//else print 404 not found for user
@@ -215,5 +240,29 @@ public class WebWorker implements Runnable
 			os.write("</body></html>\n".getBytes());
 		}
 	}
+
+	
+	// method to take the file type and assign the header accordingly
+	private void changeContentType(String fileType) {
+		if (fileType.compareTo("html") == 0) {
+			contentType = "text/html";
+		}
+		
+		else if (fileType.compareTo("txt") == 0)
+			contentType = "text/plain";
+
+		else if (fileType.compareTo("gif") == 0)
+			contentType = "image/gif";
+
+		else if (fileType.compareTo("jpg") == 0)
+			contentType = "image/jpeg";
+
+		else if (fileType.compareTo("png") == 0)
+			contentType = "image/png";
+
+		else
+			contentType = "";
+	}
+
 
 } // end class
