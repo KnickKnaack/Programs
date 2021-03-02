@@ -123,8 +123,8 @@ public class WebWorker implements Runnable
 					// attempt to make a file reader of the file at that location
 					try {
 						String fileName = line.substring(line.indexOf(" ") + 1, line.lastIndexOf(" "));
-
 						fileToGet = new File(System.getProperty("user.dir") + fileName);
+
 						fr = new FileReader(fileToGet);
 						//if successful, change status to 200 OK because the file exists
 						statusCode = "HTTP/1.1 200 OK\n";
@@ -185,18 +185,15 @@ public class WebWorker implements Runnable
 	private void writeContent(OutputStream os) throws Exception
 	{
 		
-		System.out.print(statusCode);
+		//System.out.println(statusCode);
 		//System.out.println(fileToGet.toString());
 
 
 		//make sure there is no 404 error
 		if (statusCode != "HTTP/1.1 404 Not Found\n")  {
 
-			System.out.println(contentType + "-" + contentType.substring(0, contentType.indexOf("/")) + "-");
-
 			//if this is a text file then read line by line
 			if (contentType.substring(0, contentType.indexOf("/")).compareTo("text") == 0) {
-				System.out.println("TEST");
 
 				//reassign r to a reader for the file
 				r = new BufferedReader(fr);
@@ -259,6 +256,9 @@ public class WebWorker implements Runnable
 
 		else if (fileType.compareTo("png") == 0)
 			contentType = "image/png";
+
+		else if (fileType.compareTo("ico") == 0)
+			contentType = "image/x-icon";
 
 		else
 			contentType = "";
