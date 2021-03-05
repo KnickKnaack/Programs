@@ -18,7 +18,7 @@
     </target>
 
 
-    <target name = "run" depends= "compile, clean" description = "run SimpleWebServer">
+    <target name = "run" depends= "compile" description = "run SimpleWebServer">
 	    <!-- Run SimpleWebServer-->
 	    <java className="edu.nmsu.cs.webserver.WebServer"  classpath="bin"
             fork = "true"
