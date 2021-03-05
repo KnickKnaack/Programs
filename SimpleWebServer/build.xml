@@ -5,20 +5,20 @@
         Buildfile for Program 1 of CS371
     </description>
 
-    <target name="compile" description="compile program 1">
+    <target name="compile" depends = "clean" description="compile SimpleWebServer">
         <!-- Compile the Java code from src into bin -->
         <javac srcdir="src" destdir="bin" includeantruntime="true"/>
     </target>
 
 
-    <target name = "clean" depends="compile" description = "run program 1">
+    <target name = "clean" description = "clean SimpleWebServer">
 	    <!-- Clean .class files-->
 	    <delete file="bin/edu/nmsu/cs/webserver/WebServer.class" verbose="true"/>
         <delete file="bin/edu/nmsu/cs/webserver/WebWorker.class" verbose="true"/>
     </target>
 
 
-    <target name = "run" depends= "compile" description = "run program 1">
+    <target name = "run" depends= "compile, clean" description = "run SimpleWebServer">
 	    <!-- Run SimpleWebServer-->
 	    <java className="edu.nmsu.cs.webserver.WebServer"  classpath="bin"
             fork = "true"
