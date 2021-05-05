@@ -47,7 +47,7 @@
         </java>
     </target>
 
-    <target name="test" depends = "testCircle1 testCircle2" description="test Circle1">
+    <target name="test" depends = "testCircle1, testCircle2" description="test Circle1">
     </target>
 
 
