@@ -80,6 +80,18 @@ public class Circle1Test
 		Assert.assertFalse(circle1.intersects(circle3));
 	}
 
+
+	//test scaling method on circle
+	@Test
+	public void TestScale()
+	{
+
+		circle1.scale(2);
+
+		Assert.assertTrue(circle1.radius == 6);
+	}
+
+
 	/***
 	 * NOT USED public static void main(String args[]) { try { org.junit.runner.JUnitCore.runClasses(
 	 * java.lang.Class.forName("Circle1Test")); } catch (Exception e) { System.out.println("Exception:
