@@ -18,7 +18,7 @@ public class Circle2Test
 
 	//
 	// Stuff you want to do before each test case
-	//
+	// 
 	@Before
 	public void setup()
 	{
