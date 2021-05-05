@@ -61,7 +61,7 @@ public class Circle2Test
 		Assert.assertTrue(p.x == 0 && p.y == 1);
 	}
 
-
+	//This tests two circles at a diagonal that should overlap
 	@Test
 	public void TestBound()
 	{

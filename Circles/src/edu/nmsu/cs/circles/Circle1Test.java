@@ -63,13 +63,15 @@ public class Circle1Test
 	}
 
 
+
+	//This tests two circles at a diagonal that should overlap
 	@Test
 	public void TestBound()
 	{
 		Assert.assertTrue(circle1.intersects(circle2));
 	}
 
-	
+
 
 
 	/***
