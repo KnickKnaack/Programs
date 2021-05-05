@@ -15,8 +15,8 @@ public class Circle1Test
 {
 	// Data you need for each test case
 	private Circle1 circle1;
-	// Data you need for each test case
 	private Circle1 circle2;
+	private Circle1 circle3;
 
 	//
 	// Stuff you want to do before each test case
@@ -27,6 +27,7 @@ public class Circle1Test
 		System.out.println("\nTest starting...");
 		circle1 = new Circle1(1, 2, 3);
 		circle2 = new Circle1(4, 6, 3);
+		circle3 = new Circle1(4, 6, 1.9);
 	}
 
 	//
@@ -72,7 +73,12 @@ public class Circle1Test
 	}
 
 
-
+	//test meant to break circle 1
+	@Test
+	public void TestBound2()
+	{
+		Assert.assertFalse(circle1.intersects(circle3));
+	}
 
 	/***
 	 * NOT USED public static void main(String args[]) { try { org.junit.runner.JUnitCore.runClasses(

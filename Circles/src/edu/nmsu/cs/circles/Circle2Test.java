@@ -16,6 +16,7 @@ public class Circle2Test
 	// Data you need for each test case
 	private Circle2 circle1;
 	private Circle2 circle2;
+	private Circle2 circle3;
 
 	//
 	// Stuff you want to do before each test case
@@ -26,6 +27,7 @@ public class Circle2Test
 		System.out.println("\nTest starting...");
 		circle1 = new Circle2(1, 2, 3);
 		circle2 = new Circle2(4, 6, 3);
+		circle3 = new Circle2(4, 6, 1.9);
 	}
 
 	//
@@ -66,6 +68,13 @@ public class Circle2Test
 	public void TestBound()
 	{
 		Assert.assertTrue(circle1.intersects(circle2));
+	}
+
+	//test meant to break circle 1
+	@Test
+	public void TestBound2()
+	{
+		Assert.assertFalse(circle1.intersects(circle3));
 	}
 
 	/***
