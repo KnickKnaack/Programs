@@ -14,6 +14,7 @@ import org.junit.*;
 public class Circle2Test
 {
 	// Data you need for each test case
+	private Circle2 circle1;
 	private Circle2 circle2;
 
 	//
@@ -23,7 +24,8 @@ public class Circle2Test
 	public void setup()
 	{
 		System.out.println("\nTest starting...");
-		circle2 = new Circle2(1, 2, 3);
+		circle1 = new Circle2(1, 2, 3);
+		circle2 = new Circle2(4, 6, 3);
 	}
 
 	//
@@ -43,7 +45,7 @@ public class Circle2Test
 	{
 		Point p;
 		System.out.println("Running test simpleMove.");
-		p = circle2.moveBy(1, 1);
+		p = circle1.moveBy(1, 1);
 		Assert.assertTrue(p.x == 2 && p.y == 3);
 	}
 
@@ -55,8 +57,15 @@ public class Circle2Test
 	{
 		Point p;
 		System.out.println("Running test simpleMoveNeg.");
-		p = circle2.moveBy(-1, -1);
+		p = circle1.moveBy(-1, -1);
 		Assert.assertTrue(p.x == 0 && p.y == 1);
+	}
+
+
+	@Test
+	public void TestBound()
+	{
+		Assert.assertTrue(circle1.intersects(circle2));
 	}
 
 	/***

@@ -15,6 +15,8 @@ public class Circle1Test
 {
 	// Data you need for each test case
 	private Circle1 circle1;
+	// Data you need for each test case
+	private Circle1 circle2;
 
 	//
 	// Stuff you want to do before each test case
@@ -24,6 +26,7 @@ public class Circle1Test
 	{
 		System.out.println("\nTest starting...");
 		circle1 = new Circle1(1, 2, 3);
+		circle2 = new Circle1(4, 6, 3);
 	}
 
 	//
@@ -58,6 +61,16 @@ public class Circle1Test
 		p = circle1.moveBy(-1, -1);
 		Assert.assertTrue(p.x == 0 && p.y == 1);
 	}
+
+
+	@Test
+	public void TestBound()
+	{
+		Assert.assertTrue(circle1.intersects(circle2));
+	}
+
+	
+
 
 	/***
 	 * NOT USED public static void main(String args[]) { try { org.junit.runner.JUnitCore.runClasses(
